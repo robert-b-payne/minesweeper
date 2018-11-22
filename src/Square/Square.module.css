@@ -1,0 +1,22 @@
+.Square {
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+  box-sizing: border-box;
+  /* margin: 1px; */
+  /* border: 1px solid #eee; */
+}
+
+.zero {
+  background-color: #c0c0c0;
+}
+
+.untouched {
+  /* background-color: #c0c0c0; */
+  background-color: #1966ff;
+  /* box-shadow: 1px 1px pink; */
+}
+
+br {
+  height: 0px;
+}
