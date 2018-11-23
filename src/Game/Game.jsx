@@ -9,10 +9,12 @@ class Game extends Component {
     height: 20,
     numMines: 45,
     level: null,
-    mines: null,
+    // mines: null,
     background: null, //background array, all grey
     difficulty: "easy",
-    showAll: false
+    showAll: false,
+    gameover: false,
+    victory: false
   };
 
   constructor() {
@@ -249,36 +251,39 @@ class Game extends Component {
   };
 
   clickHandler = (index, event) => {
-    console.log(
-      "clickHandler called with mouse value: " +
-        event.button +
-        " and index value: " +
-        index
-    );
-    let levelCopy = this.copyArray(this.state.level);
+    if (!this.state.gameover) {
+      console.log(
+        "clickHandler called with mouse value: " +
+          event.button +
+          " and index value: " +
+          index
+      );
+      let levelCopy = this.copyArray(this.state.level);
 
-    if (event.button === 2 && levelCopy[index[0]][index[1]].unopened) {
-      //if right click
-      levelCopy[index[0]][index[1]].flag = !levelCopy[index[0]][index[1]].flag;
-      if (!levelCopy[index[0]][index[1]].mine)
-        levelCopy[index[0]][index[1]].guessedWrong = !levelCopy[index[0]][
-          index[1]
-        ].guessedWrong;
-    } else if (event.button === 0 && !levelCopy[index[0]][index[1]].flag) {
-      //if left click
-      levelCopy[index[0]][index[1]].unopened = false;
-      if (
-        !levelCopy[index[0]][index[1]].adjacentMines &&
-        !levelCopy[index[0]][index[1]].mine
-      )
-        this.openTiles([index[0], index[1]]);
-      else if (levelCopy[index[0]][index[1]].mine) {
-        console.log("You clicked on a mine. Game over!");
-        levelCopy[index[0]][index[1]].clickedMine = true; //check if clicked on mine
-        this.setState({ showAll: true });
-      }
-    } else return;
-    this.setState({ level: levelCopy });
+      if (event.button === 2 && levelCopy[index[0]][index[1]].unopened) {
+        //if right click
+        levelCopy[index[0]][index[1]].flag = !levelCopy[index[0]][index[1]]
+          .flag;
+        if (!levelCopy[index[0]][index[1]].mine)
+          levelCopy[index[0]][index[1]].guessedWrong = !levelCopy[index[0]][
+            index[1]
+          ].guessedWrong;
+      } else if (event.button === 0 && !levelCopy[index[0]][index[1]].flag) {
+        //if left click
+        levelCopy[index[0]][index[1]].unopened = false;
+        if (
+          !levelCopy[index[0]][index[1]].adjacentMines &&
+          !levelCopy[index[0]][index[1]].mine
+        )
+          this.openTiles([index[0], index[1]]);
+        else if (levelCopy[index[0]][index[1]].mine) {
+          console.log("You clicked on a mine. Game over!");
+          levelCopy[index[0]][index[1]].clickedMine = true; //check if clicked on mine
+          this.setState({ showAll: true, gameover: true });
+        }
+      } else return;
+      this.setState({ level: levelCopy });
+    }
   };
 
   copyArray = a => {
@@ -319,12 +324,68 @@ class Game extends Component {
     return squareArray;
   };
 
+  resetHandler = () => {
+    console.log("resetting game . . . ");
+    let row = [];
+    let newLevel = [];
+    let newMines = this.generateMines();
+    console.log("mines generated!");
+    console.log(newMines);
+    for (let i = 0; i < this.state.height; i++) {
+      row = [];
+      for (let j = 0; j < this.state.width; j++) {
+        row.push({
+          mine: false,
+          unopened: true,
+          flag: false,
+          adjacentMines: 0,
+          searchingAdjacent: false, //recursive breadcrumb
+          clickedMine: false, //when clicking on a mine, a red X will appear on top
+          guessedWrong: false
+        });
+      }
+      newLevel.push(row);
+    }
+    console.log("blank level generated:");
+    console.log(newLevel);
+    console.log("setting mines . . . ");
+    newMines.forEach(x => {
+      console.log(x);
+      newLevel[x[0]][x[1]].mine = true;
+    });
+    console.log("mines set:");
+    console.log(newLevel);
+    console.log("calculating adjacent mines . . . ");
+    this.setState(
+      {
+        level: newLevel
+      },
+      () => {
+        for (let i = 0; i < this.state.height; i++) {
+          for (let j = 0; j < this.state.width; j++) {
+            newLevel[i][j].adjacentMines = this.countMines([i, j]);
+          }
+        }
+        console.log("adjacent mines calculated!");
+        console.log(newLevel);
+        this.setState({
+          level: newLevel,
+          gameover: false,
+          showAll: false,
+          victory: false
+        });
+      }
+    );
+  };
+
   render() {
     const gameWorld = this.initializeSquares();
     return (
       <div>
-        <p>React Minesweeper v{this.state.version.toFixed(1)}</p>
+        <p>React Minesweeper</p>
+        <button onClick={this.resetHandler}>New Game</button>
         <div className={classes.GameContainer}>{gameWorld}</div>
+        {this.state.gameover ? <p>Game Over!</p> : null}
       </div>
     );
   }
