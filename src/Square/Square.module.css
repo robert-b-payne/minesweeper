@@ -1,22 +1,39 @@
 .Square {
-  width: 17px;
-  height: 17px;
+  width: 22px;
+  height: 22px;
   display: inline-block;
   box-sizing: border-box;
-  /* margin: 1px; */
-  /* border: 1px solid #eee; */
-}
-
-.zero {
-  background-color: #c0c0c0;
-}
-
-.untouched {
-  /* background-color: #c0c0c0; */
-  background-color: #1966ff;
-  /* box-shadow: 1px 1px pink; */
+  position: relative;
 }
 
 br {
   height: 0px;
+}
+
+.Image {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 22px;
+  height: 22px;
+  /* display: inline-block; */
+  /* box-sizing: border-box; */
+  object-fit: fill;
+}
+
+.mine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 22px;
+  height: 22px;
+
+  object-fit: fill;
+  z-index: 1;
 }
