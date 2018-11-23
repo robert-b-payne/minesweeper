@@ -18,7 +18,7 @@ class Game extends Component {
     version: 1.0,
     width: 20, //32 x 32 in production
     height: 20,
-    numMines: 100,
+    numMines: 35,
     level: null,
     mines: null,
     background: null, //background array, all grey
@@ -37,10 +37,10 @@ class Game extends Component {
       for (let j = 0; j < this.state.width; j++) {
         row.push({
           mine: false,
-          unopened: false,
+          unopened: true,
           flag: false,
           adjacentMines: 0,
-          searchingAdjacent: false //probably don't need
+          searchingAdjacent: false //recursive breadcrumb to improve performance
         });
       }
       this.state.level.push(row);
@@ -147,6 +147,140 @@ class Game extends Component {
     return mines;
   };
 
+  openTiles = loc => {
+    // console.log("opening adjacent!");
+    let levelCopy = this.copyArray(this.state.level);
+    // console.log("loc");
+    // console.log(loc);
+    // console.log("levelCopy:");
+    // console.log(levelCopy);
+    levelCopy[loc[0]][loc[1]].searchingAdjacent = true;
+    levelCopy[loc[0]][loc[1]].unopened = false;
+    this.setState({ level: levelCopy }, () => {
+      //check for horizontally/vertically adjacent tiles for numbered tiles
+      //top
+      if (loc[0] >= 1) {
+        if (
+          this.state.level[loc[0] - 1][loc[1]].adjacentMines &&
+          !this.state.level[loc[0] - 1][loc[1]].mine
+        ) {
+          levelCopy = this.copyArray(this.state.level);
+          levelCopy[loc[0] - 1][loc[1]].unopened = false;
+          this.setState({ level: levelCopy });
+        }
+      }
+      //bottom
+      if (loc[0] < this.state.height - 1) {
+        if (
+          this.state.level[loc[0] + 1][loc[1]].adjacentMines &&
+          !this.state.level[loc[0] + 1][loc[1]].mine
+        ) {
+          levelCopy = this.copyArray(this.state.level);
+          levelCopy[loc[0] + 1][loc[1]].unopened = false;
+          this.setState({ level: levelCopy });
+        }
+      }
+      //left
+      if (loc[1] >= 1) {
+        if (
+          this.state.level[loc[0]][loc[1] - 1].adjacentMines &&
+          !this.state.level[loc[0]][loc[1] - 1].mine
+        ) {
+          levelCopy = this.copyArray(this.state.level);
+          levelCopy[loc[0]][loc[1] - 1].unopened = false;
+          this.setState({ level: levelCopy });
+        }
+      }
+      // right
+      if (loc[1] < this.state.width - 1) {
+        if (
+          this.state.level[loc[0]][loc[1] + 1].adjacentMines &&
+          !this.state.level[loc[0]][loc[1] + 1].mine
+        ) {
+          levelCopy = this.copyArray(this.state.level);
+          levelCopy[loc[0]][loc[1] + 1].unopened = false;
+          this.setState({ level: levelCopy });
+        }
+      }
+
+      //check for tiles with no mines
+      //check top left
+      if (loc[0] >= 1 && loc[1] >= 1) {
+        if (
+          !this.state.level[loc[0] - 1][loc[1] - 1].searchingAdjacent &&
+          !this.state.level[loc[0] - 1][loc[1] - 1].adjacentMines &&
+          !this.state.level[loc[0] - 1][loc[1] - 1].mine
+        )
+          this.openTiles([loc[0] - 1, loc[1] - 1]);
+      }
+      //check top
+      if (loc[0] >= 1) {
+        if (
+          !this.state.level[loc[0] - 1][loc[1]].searchingAdjacent &&
+          !this.state.level[loc[0] - 1][loc[1]].adjacentMines &&
+          !this.state.level[loc[0] - 1][loc[1]].mine
+        )
+          this.openTiles([loc[0] - 1, loc[1]]);
+      }
+      //check top right
+      if (loc[0] >= 1 && loc[1] < this.state.width - 1) {
+        if (
+          !this.state.level[loc[0] - 1][loc[1] + 1].searchingAdjacent &&
+          !this.state.level[loc[0] - 1][loc[1] + 1].adjacentMines &&
+          !this.state.level[loc[0] - 1][loc[1] + 1].mine
+        )
+          this.openTiles([loc[0] - 1, loc[1] + 1]);
+      }
+      //check left
+      if (loc[1] >= 1) {
+        if (
+          !this.state.level[loc[0]][loc[1] - 1].searchingAdjacent &&
+          !this.state.level[loc[0]][loc[1] - 1].adjacentMines &&
+          !this.state.level[loc[0]][loc[1] - 1].mine
+        )
+          this.openTiles([loc[0], loc[1] - 1]);
+      }
+      //check right
+      if (loc[1] < this.state.width - 1) {
+        if (
+          !this.state.level[loc[0]][loc[1] + 1].searchingAdjacent &&
+          !this.state.level[loc[0]][loc[1] + 1].adjacentMines &&
+          !this.state.level[loc[0]][loc[1] + 1].mine
+        )
+          this.openTiles([loc[0], loc[1] + 1]);
+      }
+      //check bottom left
+      if (loc[0] < this.state.height - 1 && loc[1] >= 1) {
+        if (
+          !this.state.level[loc[0] + 1][loc[1] - 1].searchingAdjacent &&
+          !this.state.level[loc[0] + 1][loc[1] - 1].adjacentMines &&
+          !this.state.level[loc[0] + 1][loc[1] - 1].mine
+        )
+          this.openTiles([loc[0] + 1, loc[1] - 1]);
+      }
+      //check bottom
+      if (loc[0] < this.state.height - 1) {
+        if (
+          !this.state.level[loc[0] + 1][loc[1]].searchingAdjacent &&
+          !this.state.level[loc[0] + 1][loc[1]].adjacentMines &&
+          !this.state.level[loc[0] + 1][loc[1]].mine
+        )
+          this.openTiles([loc[0] + 1, loc[1]]);
+      }
+      //check bottom right
+      if (loc[0] < this.state.height - 1 && loc[1] < this.state.width - 1) {
+        if (
+          !this.state.level[loc[0] + 1][loc[1] + 1].searchingAdjacent &&
+          !this.state.level[loc[0] + 1][loc[1] + 1].adjacentMines &&
+          !this.state.level[loc[0] + 1][loc[1] + 1].mine
+        )
+          this.openTiles([loc[0] + 1, loc[1] + 1]);
+      }
+    });
+  };
+
+  openTilesFinished = () => {};
+
   clickHandler = (index, event) => {
     console.log(
       "clickHandler called with mouse value: " +
@@ -160,6 +294,11 @@ class Game extends Component {
       levelCopy[index[0]][index[1]].flag = !levelCopy[index[0]][index[1]].flag;
     } else if (event.button === 0 && !levelCopy[index[0]][index[1]].flag) {
       levelCopy[index[0]][index[1]].unopened = false;
+      if (
+        !levelCopy[index[0]][index[1]].adjacentMines &&
+        !levelCopy[index[0]][index[1]].mine
+      )
+        this.openTiles([index[0], index[1]]);
     } else return;
     this.setState({ level: levelCopy });
   };
