@@ -16,6 +16,12 @@ import mine from "../assets/mine.png";
 
 class Square extends Component {
   // state = {  }
+
+  contextMenuHandler = event => {
+    console.log("contextMenu handler called!");
+    event.preventDefault();
+  };
+
   render() {
     let classesString = [classes.Square];
     if (this.props.color) {
@@ -54,16 +60,23 @@ class Square extends Component {
       default:
         image = zero;
     }
+
     if (this.props.level.mine) image = zero;
+    if (this.props.level.unopened) image = unopened;
+    if (this.props.level.flag) image = flag;
     return (
       <React.Fragment>
         {/* <span className={classesString} /> */}
         <div
           className={classes.Square}
-          onClick={() => this.props.clickHandler(this.props.index)}
+          // onClick={() => this.props.clickHandler(this.props.index)}
+          onMouseDown={event =>
+            this.props.clickHandler(this.props.index, event)
+          }
+          onContextMenu={event => this.contextMenuHandler(event)}
         >
           <img className={classes.Image} src={image} />
-          {this.props.level.mine ? (
+          {this.props.level.mine && !this.props.level.unopened ? (
             <img src={mine} className={classes.mine} />
           ) : null}
         </div>
