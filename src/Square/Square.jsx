@@ -13,6 +13,7 @@ import eight from "../assets/Minesweeper_8.svg";
 import flag from "../assets/Minesweeper_flag.svg";
 import unopened from "../assets/Minesweeper_unopened_square.svg";
 import mine from "../assets/mine.png";
+import red from "../assets/Minesweeper_red.svg";
 
 class Square extends Component {
   // state = {  }
@@ -62,23 +63,30 @@ class Square extends Component {
     }
 
     if (this.props.level.mine) image = zero;
-    if (this.props.level.unopened) image = unopened;
+    if (this.props.level.clickedMine) image = red;
+    if (this.props.level.unopened && !this.props.showAll) image = unopened;
     if (this.props.level.flag) image = flag;
+    if (this.props.level.guessedWrong && this.props.showAll) image = zero;
+
+    let x = (
+      <span className={[classes.x, classes.mine].join(" ")}>&#x2715;</span>
+    );
     return (
       <React.Fragment>
-        {/* <span className={classesString} /> */}
         <div
           className={classes.Square}
-          // onClick={() => this.props.clickHandler(this.props.index)}
           onMouseDown={event =>
             this.props.clickHandler(this.props.index, event)
           }
           onContextMenu={event => this.contextMenuHandler(event)}
         >
           <img className={classes.Image} src={image} />
-          {this.props.level.mine && !this.props.level.unopened ? (
+          {(this.props.level.mine || this.props.level.guessedWrong) &&
+          (!this.props.level.unopened || this.props.showAll) &&
+          !(!this.props.level.guessedWrong && this.props.level.flag) ? ( //mine picture
             <img src={mine} className={classes.mine} />
           ) : null}
+          {this.props.level.guessedWrong && this.props.showAll ? x : null}
         </div>
       </React.Fragment>
     );

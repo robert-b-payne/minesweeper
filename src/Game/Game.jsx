@@ -1,28 +1,18 @@
 import React, { Component } from "react";
 import Square from "../Square/Square";
 import classes from "./Game.module.css";
-import zero from "../assets/Minesweeper_0.svg";
-import one from "../assets/Minesweeper_1.svg";
-import two from "../assets/Minesweeper_2.svg";
-import three from "../assets/Minesweeper_3.svg";
-import four from "../assets/Minesweeper_4.svg";
-import five from "../assets/Minesweeper_5.svg";
-import six from "../assets/Minesweeper_6.svg";
-import seven from "../assets/Minesweeper_7.svg";
-import eight from "../assets/Minesweeper_8.svg";
-import flag from "../assets/Minesweeper_flag.svg";
-import unopened from "../assets/Minesweeper_unopened_square.svg";
-import mine from "../assets/mine.png";
+
 class Game extends Component {
   state = {
     version: 1.0,
     width: 20, //32 x 32 in production
     height: 20,
-    numMines: 35,
+    numMines: 45,
     level: null,
     mines: null,
     background: null, //background array, all grey
-    difficulty: "easy"
+    difficulty: "easy",
+    showAll: false
   };
 
   constructor() {
@@ -40,7 +30,9 @@ class Game extends Component {
           unopened: true,
           flag: false,
           adjacentMines: 0,
-          searchingAdjacent: false //recursive breadcrumb to improve performance
+          searchingAdjacent: false, //recursive breadcrumb
+          clickedMine: false, //when clicking on a mine, a red X will appear on top
+          guessedWrong: false
         });
       }
       this.state.level.push(row);
@@ -60,25 +52,6 @@ class Game extends Component {
     // console.log("counting mines . . . at " + loc);
     //[row][col]
     let numMines = 0;
-
-    // if (loc[0] === 5 && loc[1] === 5) {
-    //   console.log("top left of (5,5):");
-    //   console.log(this.state.level[(loc[0] - 1, loc[1] - 1)]);
-    //   console.log("top middle of (5,5):");
-    //   console.log(this.state.level[(loc[0] - 1, loc[1])]);
-    //   console.log("top right of (5,5):");
-    //   console.log(this.state.level[(loc[0] - 1, loc[1] + 1)]);
-    //   console.log("left of (5,5):");
-    //   console.log(this.state.level[(loc[0], loc[1] - 1)]);
-    //   console.log("right of (5,5):");
-    //   console.log(this.state.level[(loc[0], loc[1] + 1)]);
-    //   console.log("bottom left of (5,5):");
-    //   console.log(this.state.level[(loc[0] + 1, loc[1] - 1)]);
-    //   console.log("bottom middle of (5,5):");
-    //   console.log(this.state.level[(loc[0] + 1, loc[1])]);
-    //   console.log("bottom right of (5,5):");
-    //   console.log(this.state.level[(loc[0] + 1, loc[1] + 1)]);
-    // }
 
     //check top left
     if (loc[0] >= 1 && loc[1] >= 1) {
@@ -150,10 +123,6 @@ class Game extends Component {
   openTiles = loc => {
     // console.log("opening adjacent!");
     let levelCopy = this.copyArray(this.state.level);
-    // console.log("loc");
-    // console.log(loc);
-    // console.log("levelCopy:");
-    // console.log(levelCopy);
     levelCopy[loc[0]][loc[1]].searchingAdjacent = true;
     levelCopy[loc[0]][loc[1]].unopened = false;
     this.setState({ level: levelCopy }, () => {
@@ -279,8 +248,6 @@ class Game extends Component {
     });
   };
 
-  openTilesFinished = () => {};
-
   clickHandler = (index, event) => {
     console.log(
       "clickHandler called with mouse value: " +
@@ -291,14 +258,25 @@ class Game extends Component {
     let levelCopy = this.copyArray(this.state.level);
 
     if (event.button === 2 && levelCopy[index[0]][index[1]].unopened) {
+      //if right click
       levelCopy[index[0]][index[1]].flag = !levelCopy[index[0]][index[1]].flag;
+      if (!levelCopy[index[0]][index[1]].mine)
+        levelCopy[index[0]][index[1]].guessedWrong = !levelCopy[index[0]][
+          index[1]
+        ].guessedWrong;
     } else if (event.button === 0 && !levelCopy[index[0]][index[1]].flag) {
+      //if left click
       levelCopy[index[0]][index[1]].unopened = false;
       if (
         !levelCopy[index[0]][index[1]].adjacentMines &&
         !levelCopy[index[0]][index[1]].mine
       )
         this.openTiles([index[0], index[1]]);
+      else if (levelCopy[index[0]][index[1]].mine) {
+        console.log("You clicked on a mine. Game over!");
+        levelCopy[index[0]][index[1]].clickedMine = true; //check if clicked on mine
+        this.setState({ showAll: true });
+      }
     } else return;
     this.setState({ level: levelCopy });
   };
@@ -331,6 +309,7 @@ class Game extends Component {
             // }
             level={this.state.level[i][j]}
             clickHandler={this.clickHandler}
+            showAll={this.state.showAll}
           />
         );
       }

@@ -37,3 +37,14 @@ br {
   object-fit: fill;
   z-index: 1;
 }
+
+.x {
+  top: 20px;
+  color: red;
+  z-index: 2;
+  font-size: 1.5em;
+}
+
+.x:hover {
+  cursor: default;
+}
