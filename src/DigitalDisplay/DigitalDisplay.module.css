@@ -1,0 +1,24 @@
+.container {
+  /* border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+  justify-content: center; */
+  border: 1px solid black;
+  display: inline-block;
+  background-color: #ddd;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  /* display: inline-block; */
+}
+
+.digit_container {
+  /* border: 1px solid pink; */
+}
+
+.digit {
+  width: 25px;
+}

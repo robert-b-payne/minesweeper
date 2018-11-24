@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Square from "../Square/Square";
 import classes from "./Game.module.css";
+import Scoreboard from "../Scoreboard/Scoreboard";
+import DigitalDisplay from "../DigitalDisplay/DigitalDisplay";
 
 class Game extends Component {
   state = {
@@ -14,7 +16,9 @@ class Game extends Component {
     difficulty: "easy",
     showAll: false,
     gameover: false,
-    victory: false
+    victory: false,
+    time: 0,
+    timerId: null
   };
 
   constructor() {
@@ -48,6 +52,10 @@ class Game extends Component {
         this.state.level[i][j].adjacentMines = this.countMines([i, j]);
       }
     }
+  }
+
+  componentDidMount() {
+    this.startTimer();
   }
 
   countMines = loc => {
@@ -133,7 +141,8 @@ class Game extends Component {
       if (loc[0] >= 1) {
         if (
           this.state.level[loc[0] - 1][loc[1]].adjacentMines &&
-          !this.state.level[loc[0] - 1][loc[1]].mine
+          !this.state.level[loc[0] - 1][loc[1]].mine &&
+          !this.state.level[loc[0] - 1][loc[1]].flag
         ) {
           levelCopy = this.copyArray(this.state.level);
           levelCopy[loc[0] - 1][loc[1]].unopened = false;
@@ -144,7 +153,8 @@ class Game extends Component {
       if (loc[0] < this.state.height - 1) {
         if (
           this.state.level[loc[0] + 1][loc[1]].adjacentMines &&
-          !this.state.level[loc[0] + 1][loc[1]].mine
+          !this.state.level[loc[0] + 1][loc[1]].mine &&
+          !this.state.level[loc[0] + 1][loc[1]].flag
         ) {
           levelCopy = this.copyArray(this.state.level);
           levelCopy[loc[0] + 1][loc[1]].unopened = false;
@@ -155,7 +165,8 @@ class Game extends Component {
       if (loc[1] >= 1) {
         if (
           this.state.level[loc[0]][loc[1] - 1].adjacentMines &&
-          !this.state.level[loc[0]][loc[1] - 1].mine
+          !this.state.level[loc[0]][loc[1] - 1].mine &&
+          !this.state.level[loc[0]][loc[1] - 1].flag
         ) {
           levelCopy = this.copyArray(this.state.level);
           levelCopy[loc[0]][loc[1] - 1].unopened = false;
@@ -166,7 +177,8 @@ class Game extends Component {
       if (loc[1] < this.state.width - 1) {
         if (
           this.state.level[loc[0]][loc[1] + 1].adjacentMines &&
-          !this.state.level[loc[0]][loc[1] + 1].mine
+          !this.state.level[loc[0]][loc[1] + 1].mine &&
+          !this.state.level[loc[0]][loc[1] + 1].flag
         ) {
           levelCopy = this.copyArray(this.state.level);
           levelCopy[loc[0]][loc[1] + 1].unopened = false;
@@ -180,7 +192,8 @@ class Game extends Component {
         if (
           !this.state.level[loc[0] - 1][loc[1] - 1].searchingAdjacent &&
           !this.state.level[loc[0] - 1][loc[1] - 1].adjacentMines &&
-          !this.state.level[loc[0] - 1][loc[1] - 1].mine
+          !this.state.level[loc[0] - 1][loc[1] - 1].mine &&
+          !this.state.level[loc[0] - 1][loc[1] - 1].flag
         )
           this.openTiles([loc[0] - 1, loc[1] - 1]);
       }
@@ -189,7 +202,8 @@ class Game extends Component {
         if (
           !this.state.level[loc[0] - 1][loc[1]].searchingAdjacent &&
           !this.state.level[loc[0] - 1][loc[1]].adjacentMines &&
-          !this.state.level[loc[0] - 1][loc[1]].mine
+          !this.state.level[loc[0] - 1][loc[1]].mine &&
+          !this.state.level[loc[0] - 1][loc[1]].flag
         )
           this.openTiles([loc[0] - 1, loc[1]]);
       }
@@ -198,7 +212,8 @@ class Game extends Component {
         if (
           !this.state.level[loc[0] - 1][loc[1] + 1].searchingAdjacent &&
           !this.state.level[loc[0] - 1][loc[1] + 1].adjacentMines &&
-          !this.state.level[loc[0] - 1][loc[1] + 1].mine
+          !this.state.level[loc[0] - 1][loc[1] + 1].mine &&
+          !this.state.level[loc[0] - 1][loc[1] + 1].flag
         )
           this.openTiles([loc[0] - 1, loc[1] + 1]);
       }
@@ -207,16 +222,18 @@ class Game extends Component {
         if (
           !this.state.level[loc[0]][loc[1] - 1].searchingAdjacent &&
           !this.state.level[loc[0]][loc[1] - 1].adjacentMines &&
-          !this.state.level[loc[0]][loc[1] - 1].mine
+          !this.state.level[loc[0]][loc[1] - 1].mine &&
+          !this.state.level[loc[0]][loc[1] - 1].flag
         )
           this.openTiles([loc[0], loc[1] - 1]);
       }
-      //check right
+      //check rightton onClick={this.resetHandler}>New Game</button>
       if (loc[1] < this.state.width - 1) {
         if (
           !this.state.level[loc[0]][loc[1] + 1].searchingAdjacent &&
           !this.state.level[loc[0]][loc[1] + 1].adjacentMines &&
-          !this.state.level[loc[0]][loc[1] + 1].mine
+          !this.state.level[loc[0]][loc[1] + 1].mine &&
+          !this.state.level[loc[0]][loc[1] + 1].flag
         )
           this.openTiles([loc[0], loc[1] + 1]);
       }
@@ -225,7 +242,8 @@ class Game extends Component {
         if (
           !this.state.level[loc[0] + 1][loc[1] - 1].searchingAdjacent &&
           !this.state.level[loc[0] + 1][loc[1] - 1].adjacentMines &&
-          !this.state.level[loc[0] + 1][loc[1] - 1].mine
+          !this.state.level[loc[0] + 1][loc[1] - 1].mine &&
+          !this.state.level[loc[0] + 1][loc[1] - 1].flag
         )
           this.openTiles([loc[0] + 1, loc[1] - 1]);
       }
@@ -234,7 +252,8 @@ class Game extends Component {
         if (
           !this.state.level[loc[0] + 1][loc[1]].searchingAdjacent &&
           !this.state.level[loc[0] + 1][loc[1]].adjacentMines &&
-          !this.state.level[loc[0] + 1][loc[1]].mine
+          !this.state.level[loc[0] + 1][loc[1]].mine &&
+          !this.state.level[loc[0] + 1][loc[1]].flag
         )
           this.openTiles([loc[0] + 1, loc[1]]);
       }
@@ -243,7 +262,8 @@ class Game extends Component {
         if (
           !this.state.level[loc[0] + 1][loc[1] + 1].searchingAdjacent &&
           !this.state.level[loc[0] + 1][loc[1] + 1].adjacentMines &&
-          !this.state.level[loc[0] + 1][loc[1] + 1].mine
+          !this.state.level[loc[0] + 1][loc[1] + 1].mine &&
+          !this.state.level[loc[0] + 1][loc[1] + 1].flag
         )
           this.openTiles([loc[0] + 1, loc[1] + 1]);
       }
@@ -260,16 +280,17 @@ class Game extends Component {
       );
       let levelCopy = this.copyArray(this.state.level);
 
+      //if right click
       if (event.button === 2 && levelCopy[index[0]][index[1]].unopened) {
-        //if right click
         levelCopy[index[0]][index[1]].flag = !levelCopy[index[0]][index[1]]
           .flag;
         if (!levelCopy[index[0]][index[1]].mine)
           levelCopy[index[0]][index[1]].guessedWrong = !levelCopy[index[0]][
             index[1]
           ].guessedWrong;
-      } else if (event.button === 0 && !levelCopy[index[0]][index[1]].flag) {
-        //if left click
+      }
+      //if left click
+      else if (event.button === 0 && !levelCopy[index[0]][index[1]].flag) {
         levelCopy[index[0]][index[1]].unopened = false;
         if (
           !levelCopy[index[0]][index[1]].adjacentMines &&
@@ -279,6 +300,7 @@ class Game extends Component {
         else if (levelCopy[index[0]][index[1]].mine) {
           console.log("You clicked on a mine. Game over!");
           levelCopy[index[0]][index[1]].clickedMine = true; //check if clicked on mine
+          this.stopTimer();
           this.setState({ showAll: true, gameover: true });
         }
       } else return;
@@ -324,7 +346,27 @@ class Game extends Component {
     return squareArray;
   };
 
+  startTimer = () => {
+    let timerId = setInterval(() => {
+      this.setState({ time: this.state.time + 1 });
+    }, 1000);
+
+    this.setState({ timerId: timerId });
+  };
+
+  stopTimer = () => {
+    clearInterval(this.state.timerId);
+  };
+
+  restartTimer = () => {
+    this.stopTimer();
+    this.setState({ time: 0 }, () => {
+      this.startTimer();
+    });
+  };
+
   resetHandler = () => {
+    this.restartTimer();
     console.log("resetting game . . . ");
     let row = [];
     let newLevel = [];
@@ -383,8 +425,18 @@ class Game extends Component {
     return (
       <div>
         <p>React Minesweeper</p>
-        <button onClick={this.resetHandler}>New Game</button>
-        <div className={classes.GameContainer}>{gameWorld}</div>
+        {/* <button onClick={this.resetHandler}>New Game</button> */}
+        <div className={classes.GameContainer}>
+          <Scoreboard
+            time="0"
+            remainingMines="100"
+            resetHandler={this.resetHandler}
+            gameover={this.state.gameover}
+            victory={this.state.victory}
+            time={this.state.time}
+          />
+          {gameWorld}
+        </div>
         {this.state.gameover ? <p>Game Over!</p> : null}
       </div>
     );
