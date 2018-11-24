@@ -16,8 +16,9 @@ import classes from "./DigitalDisplay.module.css";
 const DigitalDisplay = props => {
   let num = props.val;
   let negative = num < 0 ? true : false;
-  console.log("negative: " + negative);
-  if (props.val > 999 || props.val < -999) num = 999;
+  // console.log("negative: " + negative);
+  if (props.val > 999) num = 999;
+  else if (props.val < -99) num = -99;
   if (negative) {
     num = num * -1;
   }
@@ -25,8 +26,8 @@ const DigitalDisplay = props => {
   let image;
   let numArray = [];
   let index = 0;
-  console.log("rendering DigitalDisplay . . . ");
-  console.log("input value: " + num);
+  // console.log("rendering DigitalDisplay . . . ");
+  // console.log("input value: " + num);
   do {
     tempNum = num % 10;
     switch (tempNum) {
@@ -61,7 +62,7 @@ const DigitalDisplay = props => {
         image = nine_digit;
         break;
     }
-    console.log("pushing value " + tempNum);
+    // console.log("pushing value " + tempNum);
     numArray.push(
       <span className={classes.digit_container} key={index}>
         <img src={image} className={classes.digit} />
@@ -88,27 +89,28 @@ const DigitalDisplay = props => {
     );
   }
 
-  if (props.mineCounter) {
-    if (negative) {
-      correctNumArray.splice(
-        0,
-        0,
-        <span key={"negative"}>
-          <img src={negative_digit} className={classes.digit} />
-        </span>
-      );
-    } else {
-      correctNumArray.splice(
-        0,
-        0,
-        <span key={"empty"}>
-          <img src={empty_digit} className={classes.digit} />
-        </span>
-      );
-    }
+  // if (props.mineCounter) {
+  if (negative) {
+    correctNumArray.splice(
+      0,
+      1,
+      <span key={"negative"}>
+        <img src={negative_digit} className={classes.digit} />
+      </span>
+    );
   }
+  // else {
+  //   correctNumArray.splice(
+  //     0,
+  //     0,
+  //     <span key={"empty"}>
+  //       <img src={empty_digit} className={classes.digit} />
+  //     </span>
+  //   );
+  // }
+  // }
 
-  console.log(correctNumArray);
+  // console.log(correctNumArray);
 
   return <div className={classes.container}>{correctNumArray}</div>;
 };

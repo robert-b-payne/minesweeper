@@ -8,19 +8,20 @@ import DigitalDisplay from "../DigitalDisplay/DigitalDisplay";
 
 class Scoreboard extends Component {
   render() {
-    let image = this.props.gameover
-      ? Dead
-      : this.props.victory
-      ? Glasses
-      : this.props.scaredFace
-      ? Surprised
-      : Smiley;
+    let image =
+      this.props.gameover && !this.props.victory
+        ? Dead
+        : this.props.gameover && this.props.victory
+        ? Glasses
+        : this.props.scaredFace
+        ? Surprised
+        : Smiley;
     return (
       // <div className={classes.outerContainer}>
       <div className={classes.container}>
         <span className={classes.flexItem}>
           <span className={classes.remaining}>
-            <DigitalDisplay val={60} mineCounter />
+            <DigitalDisplay val={this.props.flagCounter} />
           </span>
         </span>
 
