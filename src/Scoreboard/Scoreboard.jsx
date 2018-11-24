@@ -12,23 +12,28 @@ class Scoreboard extends Component {
       ? Dead
       : this.props.victory
       ? Glasses
-      : this.props.clicking
+      : this.props.scaredFace
       ? Surprised
       : Smiley;
     return (
-      <div className={classes.outerContainer}>
-        <div className={classes.container}>
+      // <div className={classes.outerContainer}>
+      <div className={classes.container}>
+        <span className={classes.flexItem}>
           <span className={classes.remaining}>
-            <DigitalDisplay val={20} />
+            <DigitalDisplay val={60} mineCounter />
           </span>
-          <span onClick={this.props.resetHandler}>
-            <img className={classes.resetButton} src={image} />
-          </span>
+        </span>
+
+        <span onClick={this.props.resetHandler}>
+          <img className={classes.resetButton} src={image} />
+        </span>
+        <span className={classes.flexItem}>
           <span className={classes.time}>
             <DigitalDisplay val={this.props.time} />
           </span>
-        </div>
+        </span>
       </div>
+      // </div>
     );
   }
 }

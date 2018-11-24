@@ -18,7 +18,8 @@ class Game extends Component {
     gameover: false,
     victory: false,
     time: 0,
-    timerId: null
+    timerId: null,
+    scaredFace: false
   };
 
   constructor() {
@@ -316,6 +317,13 @@ class Game extends Component {
     return copiedArray;
   };
 
+  // mouseUpHandler = () => {
+  //   console.log(
+  //     "===================================mouseUpHandler called!==================================="
+  //   );
+  //   this.setState({ scaredFace: false });
+  // };
+
   initializeSquares = () => {
     let squareRow;
     let squareArray = [];
@@ -336,6 +344,7 @@ class Game extends Component {
             // }
             level={this.state.level[i][j]}
             clickHandler={this.clickHandler}
+            // onMouseUp={this.mouseUpHandler}
             showAll={this.state.showAll}
           />
         );
@@ -434,6 +443,7 @@ class Game extends Component {
             gameover={this.state.gameover}
             victory={this.state.victory}
             time={this.state.time}
+            // scaredFace={this.state.scaredFace}
           />
           {gameWorld}
         </div>

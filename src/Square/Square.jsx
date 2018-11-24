@@ -78,6 +78,7 @@ class Square extends Component {
           onMouseDown={event =>
             this.props.clickHandler(this.props.index, event)
           }
+          onMouseUp={this.props.mouseUpHandler}
           onContextMenu={event => this.contextMenuHandler(event)}
         >
           <img className={classes.Image} src={image} />
