@@ -3,17 +3,18 @@ import Square from "../Square/Square";
 import classes from "./Game.module.css";
 import Scoreboard from "../Scoreboard/Scoreboard";
 import DigitalDisplay from "../DigitalDisplay/DigitalDisplay";
+import DifficultySelector from "../DifficultySelector/DifficultySelector";
 
 class Game extends Component {
   state = {
     version: 1.0,
-    width: 20, //32 x 32 in production
-    height: 20,
-    numMines: 5,
+    width: 10, //32 x 32 in production
+    height: 10,
+    numMines: 10,
     level: null,
     // mines: null,
     background: null, //background array, all grey
-    difficulty: "easy",
+    difficulty: "beginner",
     showAll: false,
     gameover: false,
     victory: false,
@@ -27,6 +28,11 @@ class Game extends Component {
     super();
     //initialize level array
     console.log("Minesweeper v" + this.state.version);
+    if (this.state.difficulty === "beginner") {
+      this.state.numMines = 10;
+      this.state.width = 10;
+      this.state.height = 10;
+    }
     this.state.flagCounter = this.state.numMines;
     this.state.minesRemaining = this.state.numMines;
     let row = [];
@@ -351,8 +357,14 @@ class Game extends Component {
   // };
 
   initializeSquares = () => {
+    if (!this.state.level) {
+      return null;
+    }
     let squareRow;
     let squareArray = [];
+    let pixelWidth = 24 * this.state.width;
+    console.log("this.state.level: ");
+    console.log(this.state.level);
     for (let i = 0; i < this.state.height; i++) {
       squareRow = [];
       for (let j = 0; j < this.state.width; j++) {
@@ -375,7 +387,12 @@ class Game extends Component {
           />
         );
       }
-      squareArray.push(<div key={i}>{squareRow}</div>);
+
+      squareArray.push(
+        <div style={{ width: pixelWidth + "px" }} key={i}>
+          {squareRow}
+        </div>
+      );
       //   squareArray.push(<br key={i} style={{ lineHeight: "0" }} />);
     }
     return squareArray;
@@ -401,11 +418,22 @@ class Game extends Component {
   };
 
   resetHandler = () => {
+    console.log("resetting game . . . ");
     this.restartTimer();
-    // console.log("resetting game . . . ");
     let row = [];
     let newLevel = [];
+
+    // let length;
+    // let width;
+    // let numMines;
+
+    // switch(difficulty){
+    //   case 'beginner':
+    //     length
+    // }
+
     let newMines = this.generateMines();
+
     // console.log("mines generated!");
     // console.log(newMines);
     for (let i = 0; i < this.state.height; i++) {
@@ -457,13 +485,80 @@ class Game extends Component {
     );
   };
 
+  changeDifficultyHandler = difficulty => {
+    console.log("changing difficulty to " + difficulty);
+    // this.resetHandler(difficulty);
+    switch (difficulty) {
+      case "beginner":
+        this.setState(
+          {
+            difficulty: "beginner",
+            height: 10,
+            width: 10,
+            numMines: 10,
+            level: null
+          },
+          () => {
+            this.resetHandler();
+          }
+        );
+
+        break;
+      case "intermediate":
+        this.setState(
+          {
+            difficulty: "intermediate",
+            height: 16,
+            width: 16,
+            numMines: 40,
+            level: null
+          },
+          () => {
+            this.resetHandler();
+          }
+        );
+        break;
+      case "expert":
+        this.setState(
+          {
+            difficulty: "expert",
+            height: 24,
+            width: 24,
+            numMines: 99,
+            level: null
+          },
+          () => {
+            this.resetHandler();
+          }
+        );
+        break;
+      default:
+        this.setState(
+          {
+            difficulty: "beginner",
+            height: 8,
+            width: 8,
+            numMines: 10,
+            level: null
+          },
+          () => {
+            this.resetHandler();
+          }
+        );
+    }
+  };
+
   render() {
     const gameWorld = this.initializeSquares();
     return (
       <div>
-        <p>React Minesweeper</p>
+        <h3>React Minesweeper</h3>
         {/* <button onClick={this.resetHandler}>New Game</button> */}
         <div className={classes.GameContainer}>
+          <DifficultySelector
+            changeDifficultyHandler={this.changeDifficultyHandler}
+            difficulty={this.state.difficulty}
+          />
           <Scoreboard
             time="0"
             flagCounter={this.state.flagCounter}
@@ -473,7 +568,7 @@ class Game extends Component {
             time={this.state.time}
             // scaredFace={this.state.scaredFace}
           />
-          {gameWorld}
+          <span style={{ lineHeight: "0" }}>{gameWorld}</span>
         </div>
         {/* {this.state.gameover ? <p>Game Over!</p> : null} */}
       </div>

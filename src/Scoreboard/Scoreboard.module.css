@@ -1,6 +1,6 @@
 .resetButton {
-  width: 50px;
-  height: 50px;
+  width: 53px;
+  height: 53px;
   display: inline-block;
   border: 1px solid rgba(0, 0, 0, 0.5);
   /* margin-left: 25px;
@@ -9,7 +9,6 @@
   box-sizing: border-box;
   transform: translateY(-2px);
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), 1px 1px 1px white inset;
-  transition: all 0.05s ease-out;
 }
 
 .resetButton:active {
@@ -53,10 +52,17 @@
   justify-content: space-between;
   /* border: 1px solid green; */
   margin-bottom: 10px;
+  /* box-shadow: 2px 2px white inset, 2px 2px rgba(0, 0, 0, 0.5); */
+  /* border-top: rgba(0, 0, 0, 0.3) solid 2px;
+  border-left: rgba(0, 0, 0, 0.3) solid 2px;
+  border-bottom: rgba(255, 255, 255, 0.4) solid 2px;
+  border-right: rgba(255, 255, 255, 0.4) solid 2px;
+  padding: 5px;
+  box-sizing: border-box; */
 }
 
 .flexItem {
-  width: 120px;
+  width: 82px;
   /* border: 1px solid red; */
   position: relative;
 }
