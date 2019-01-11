@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Square from "../Square/Square";
 import classes from "./Game.module.css";
 import Scoreboard from "../Scoreboard/Scoreboard";
-import DigitalDisplay from "../DigitalDisplay/DigitalDisplay";
 import DifficultySelector from "../DifficultySelector/DifficultySelector";
+import Preloader from "../Preloader/Preloader";
 
 class Game extends Component {
   state = {
@@ -27,7 +27,7 @@ class Game extends Component {
   constructor() {
     super();
     //initialize level array
-    console.log("Minesweeper v" + this.state.version);
+    // console.log("Minesweeper v" + this.state.version);
     if (this.state.difficulty === "beginner") {
       this.state.numMines = 10;
       this.state.width = 10;
@@ -363,8 +363,8 @@ class Game extends Component {
     let squareRow;
     let squareArray = [];
     let pixelWidth = 24 * this.state.width;
-    console.log("this.state.level: ");
-    console.log(this.state.level);
+    // console.log("this.state.level: ");
+    // console.log(this.state.level);
     for (let i = 0; i < this.state.height; i++) {
       squareRow = [];
       for (let j = 0; j < this.state.width; j++) {
@@ -551,27 +551,30 @@ class Game extends Component {
   render() {
     const gameWorld = this.initializeSquares();
     return (
-      <div>
-        <h3>React Minesweeper</h3>
-        {/* <button onClick={this.resetHandler}>New Game</button> */}
-        <div className={classes.GameContainer}>
-          <DifficultySelector
-            changeDifficultyHandler={this.changeDifficultyHandler}
-            difficulty={this.state.difficulty}
-          />
-          <Scoreboard
-            time="0"
-            flagCounter={this.state.flagCounter}
-            resetHandler={this.resetHandler}
-            gameover={this.state.gameover}
-            victory={this.state.victory}
-            time={this.state.time}
-            // scaredFace={this.state.scaredFace}
-          />
-          <span style={{ lineHeight: "0" }}>{gameWorld}</span>
+      <React.Fragment>
+        <Preloader />
+        <div>
+          <h3>React Minesweeper</h3>
+          {/* <button onClick={this.resetHandler}>New Game</button> */}
+          <div className={classes.GameContainer}>
+            <DifficultySelector
+              changeDifficultyHandler={this.changeDifficultyHandler}
+              difficulty={this.state.difficulty}
+            />
+            <Scoreboard
+              time="0"
+              flagCounter={this.state.flagCounter}
+              resetHandler={this.resetHandler}
+              gameover={this.state.gameover}
+              victory={this.state.victory}
+              time={this.state.time}
+              // scaredFace={this.state.scaredFace}
+            />
+            <span style={{ lineHeight: "0" }}>{gameWorld}</span>
+          </div>
+          {/* {this.state.gameover ? <p>Game Over!</p> : null} */}
         </div>
-        {/* {this.state.gameover ? <p>Game Over!</p> : null} */}
-      </div>
+      </React.Fragment>
     );
   }
 }

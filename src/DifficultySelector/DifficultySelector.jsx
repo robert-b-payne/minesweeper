@@ -47,7 +47,7 @@ class DifficultySelector extends Component {
               onClick={() => this.props.changeDifficultyHandler("intermediate")}
             >
               <span>
-                intermediate
+                Intermediate
                 {this.props.difficulty === "intermediate" ? (
                   <span> &#10003;</span>
                 ) : null}
